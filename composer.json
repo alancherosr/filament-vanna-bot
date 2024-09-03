@@ -64,7 +64,7 @@
                 "Alancherosr\\FilamentVannaBot\\FilamentVannaBotServiceProvider"
             ],
             "aliases": {
-                "FilamentChatgptBot": "Alancherosr\\FilamentVannaBot\\Facades\\FilamentVannaBot"
+                "FilamentVannaBot": "Alancherosr\\FilamentVannaBot\\Facades\\FilamentVannaBot"
             }
         }
     },
