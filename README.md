@@ -1,6 +1,6 @@
-# ChatGPT Intergration 
+# Vanna Intergration 
 
-Filament ChatGPT Bot is a filament plugin that allow you to use ChatGPT out of the box within Filament Application. 
+Filament Vanna Bot is a filament plugin that allow you to use Vanna.ai API within Filament Application.
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/icetalker/filament-chatgpt-bot.svg?style=flat-square)](https://packagist.org/packages/icetalker/filament-chatgpt-bot)
 [![Total Downloads](https://img.shields.io/packagist/dt/icetalker/filament-chatgpt-bot.svg?style=flat-square)](https://packagist.org/packages/icetalker/filament-chatgpt-bot)
@@ -14,7 +14,7 @@ Light Mode:
 
 ## Feature
 
-- Integrate with ChatGPT
+- Integrate with Vanna.ai
 - Easy to Setup
 - Shortcut allows control of panel in more convenient way
 - Support for dark mode
@@ -25,13 +25,7 @@ Light Mode:
 First, you can install the package via composer:
 
 ```bash
-composer require icetalker/filament-chatgpt-bot
-```
-
-For Filament V2, Please lock the the version to v0.1.*:
-
-```bash
-composer require icetaker/filament-chatgpt-bot:"v0.1.3"
+composer require alancherosr/filament-vanna-bot
 ```
 
 ## Publish Config Files
@@ -39,10 +33,10 @@ composer require icetaker/filament-chatgpt-bot:"v0.1.3"
 Next, you can publish the config files with:
 
 ```bash
-php artisan vendor:publish --tag="filament-chatgpt-bot-config"
+php artisan vendor:publish --tag="filament-vanna-bot-config"
 ```
 
-This will create a `config/filament-chatgpt-bot.php` configuration file in your project, which you can modify to your needs using environment variables:
+This will create a `config/filament-vanna-bot.php` configuration file in your project, which you can modify to your needs using environment variables:
 
 ```
 OPENAI_API_KEY=sk-...
@@ -61,12 +55,12 @@ OPENAI_PROXY=127.0.0.1:8080
 Optionally, you can publish the views using
 
 ```bash
-php artisan vendor:publish --tag="filament-chatgpt-bot-views"
+php artisan vendor:publish --tag="filament-vanna-bot-views"
 ```
 
 ## More
 
-1. By defult, there is a small chatgpt icon on bottom-right corner of admin panel after the package installed. You could hide the icon by setting `enable` to `false` in `config/filament-chatgpt-bot.php` files:
+1. By defult, there is a small chatgpt icon on bottom-right corner of admin panel after the package installed. You could hide the icon by setting `enable` to `false` in `config/filament-vanna-bot.php` files:
 
 ```php
 
@@ -90,7 +84,7 @@ public function panel(Panel $panel): Panel
 }
 ```
 
-> Set `enable` in `config/filament-chatgpt-bot.php` files, if you like to render it in [Panel Configuration](https://laravel-filament.cn/docs/en/3.x/panels/configuration#render-hooks).
+> Set `enable` in `config/filament-vanna-bot.php` files, if you like to render it in [Panel Configuration](https://laravel-filament.cn/docs/en/3.x/panels/configuration#render-hooks).
 
 3. Alternatively, you can add it to any blade file within livewire page if you like to do it manually:
 
@@ -99,11 +93,11 @@ public function panel(Panel $panel): Panel
 
     ...
 
-    @livewire('filament-chatgpt-bot')
+    @livewire('filament-vanna-bot')
 </body>
 ```
 
-> This is work for all livewire page in any Laravel Project, not just Filament. Please also make sure Tailwind CSS and Livewire were imported properly while use in other Laravel Project. And please note that you should also set `enable` to be `false` in `config/filament-chatgpt-bot.php` files while use this in non-Filament Project.
+> This is work for all livewire page in any Laravel Project, not just Filament. Please also make sure Tailwind CSS and Livewire were imported properly while use in other Laravel Project. And please note that you should also set `enable` to be `false` in `config/filament-vanna-bot.php` files while use this in non-Filament Project.
 
 ## Changelog
 

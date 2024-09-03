@@ -1,17 +1,17 @@
 {
-    "name": "icetalker/filament-chatgpt-bot",
-    "description": "Integrate with OpenAI ChatGPT",
+    "name": "alancherosr/filament-vanna-bot",
+    "description": "Integrate with Vanna.ai",
     "keywords": [
-        "icetalker",
+        "alancherosr",
         "laravel",
-        "filament-chatgpt-bot"
+        "filament-vanna-bot"
     ],
-    "homepage": "https://github.com/icetalker/filament-chatgpt-bot",
+    "homepage": "https://github.com/alancherosr/filament-vanna-bot",
     "license": "MIT",
     "authors": [
         {
-            "name": "Martin Hwang",
-            "email": "termlong.com@gmail.com",
+            "name": "Andres Lancheros",
+            "email": "alancherosr@gmail.com",
             "role": "Developer"
         }
     ],
@@ -36,12 +36,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Icetalker\\FilamentChatgptBot\\": "src"
+            "Alancherosr\\FilamentVannaBot\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Icetalker\\FilamentChatgptBot\\Tests\\": "tests"
+            "Alancherosr\\FilamentVannaBot\\Tests\\": "tests"
         }
     },
     "scripts": {
@@ -61,10 +61,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Icetalker\\FilamentChatgptBot\\FilamentChatgptBotServiceProvider"
+                "Alancherosr\\FilamentVannaBot\\FilamentVannaBotServiceProvider"
             ],
             "aliases": {
-                "FilamentChatgptBot": "Icetalker\\FilamentChatgptBot\\Facades\\FilamentChatgptBot"
+                "FilamentChatgptBot": "Alancherosr\\FilamentVannaBot\\Facades\\FilamentVannaBot"
             }
         }
     },

@@ -1,11 +1,11 @@
 <?php
 
-namespace Icetalker\FilamentChatgptBot\Components;
+namespace Alancherosr\FilamentVannaBot\Components;
 
-use Icetalker\FilamentChatgptBot\OpenAI;
+use Alancherosr\FilamentVannaBot\OpenAI;
 use Livewire\Component;
 
-class ChatgptBot extends Component
+class VannaBot extends Component
 {
 
     public string $name;
@@ -50,12 +50,12 @@ class ChatgptBot extends Component
 
     public function render()
     {
-        return view('filament-chatgpt-bot::livewire.chat-bot');
+        return view('filament-vanna-bot::livewire.chat-bot');
     }
 
     public function name(): void
     {
-        $this->name =  config('filament-chatgpt-bot.botname') ?? 'ChatGPT';
+        $this->name =  config('filament-vanna-bot.botname') ?? 'Vanna';
     }
 
     public function sendMessage(): void

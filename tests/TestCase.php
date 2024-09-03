@@ -1,10 +1,10 @@
 <?php
 
-namespace Icetalker\FilamentChatbot\Tests;
+namespace Alancherosr\FilamentChatbot\Tests;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Icetalker\FilamentChatbot\FilamentChatbotServiceProvider;
+use Alancherosr\FilamentChatbot\FilamentChatbotServiceProvider;
 
 class TestCase extends Orchestra
 {
@@ -13,7 +13,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Icetalker\\FilamentChatbot\\Database\\Factories\\'.class_basename($modelName).'Factory'
+            fn (string $modelName) => 'Alancherosr\\FilamentChatbot\\Database\\Factories\\'.class_basename($modelName).'Factory'
         );
     }
 
