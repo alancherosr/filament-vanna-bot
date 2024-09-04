@@ -1,10 +1,10 @@
 <?php
 
-// config for Icetalker/FilamentChatgptBot
+// config for Alancherosr/FilamentVannaBot
 return [
-    'enable' => false,
+    'enable' => true,
 
-    'botname' => env('ICETALKER_BOTNAME'),
+    'botname' => env('BOTNAME'),
 
     'openai' => [
         'api_key' => env('OPENAI_API_KEY'),

@@ -2,28 +2,20 @@
 
 namespace Alancherosr\FilamentVannaBot\Components;
 
-use Alancherosr\FilamentVannaBot\OpenAI;
+use Illuminate\Support\Facades\Http;
 use Livewire\Component;
 
 class VannaBot extends Component
 {
 
     public string $name;
-
     public array $messages;
-
     public string $question;
-
     public string $winWidth;
-
     public string $winPosition;
-
     public bool $showPositionBtn;
-
     public bool $panelHidden;
-
     private string $sessionKey;
-
     protected $listeners = [
         //shortcut
         'ctrl+s' => 'sendMessage',
@@ -41,7 +33,7 @@ class VannaBot extends Component
     public function mount(): void
     {
         $this->panelHidden = true;
-        $this->winWidth = "width:350px;";
+        $this->winWidth = "width:550px;";
         $this->winPosition = "";
         $this->showPositionBtn = true;
         $this->messages = session($this->sessionKey, []);
@@ -64,14 +56,18 @@ class VannaBot extends Component
             $this->question = "";
             return;
         }
+
+        // Store the question in a temporary variable before resetting it
+        $user_question = trim($this->question);
+
         $this->messages[] = [
             "role" => 'user',
-            "content" => $this->question,
+            "content" => $user_question,
         ];
 
         $this->dispatch('sendmessage', ['message' => $this->question]);
         $this->question = "";
-        $this->chat();
+        $this->chat($user_question);
     }
 
     public function changeWinWidth(): void
@@ -105,27 +101,91 @@ class VannaBot extends Component
         $this->panelHidden = !$this->panelHidden;
     }
 
-    protected function chat(): void
+    protected function chat(string $user_question): void
     {
 
-        $client = OpenAI::client();
+        try {
+            // First, send the question to Vanna API to generate SQL
+            $response = Http::get('http://kpi-copilot-api:5000/api/v0/generate_sql', [
+                'question' => $user_question,
+            ]);
+            
+            $response_body = $response->json();
 
-        $response = $client->chat([
-            'model' => 'gpt-3.5-turbo',
-            'messages' => $this->messages
-        ]);
-        if($response){
-            $response = json_decode($response);
-        }
+            if (!$response->ok() || isset($response_body['error'])) {
+                $this->messages[] = [
+                    'role' => 'assistant',
+                    'content' => $response_body['error']['message'] ?? 'Error generating SQL',
+                ];
+                return;
+            }
 
-        if (@$response->error) {
-            $this->messages[] = ['role' => 'assistant', 'content' => $response->error->message];
-        } else {
-            $this->messages[] = ['role' => 'assistant', 'content' => @$response->choices[0]->message->content];
+            $sql_id = $response_body['id'];
+
+            // After receiving the SQL, execute it using Vanna API
+            $sql_response = Http::get('http://kpi-copilot-api:5000/api/v0/run_sql', [
+                'id' => $sql_id,
+            ]);
+
+            $sql_response_body = $sql_response->json();
+
+            logger()->debug('Into chat', [
+                'question' => $user_question,
+                'response_body' => $response_body,
+                'sql_id' => $sql_id,
+                'sql_response_body' => $sql_response_body,
+            ]);
+
+            if (!$sql_response->ok() || isset($sql_response_body['error'])) {
+                $this->messages[] = [
+                    'role' => 'assistant',
+                    'content' => $sql_response_body['error']['message'] ?? 'Error executing SQL',
+                ];
+            } else {
+                $sql_response_parsed = $this->handleApiResponseData($sql_response_body);
+                $this->messages[] = [
+                    'role' => 'assistant',
+                    'content' => $sql_response_parsed,
+                ];
+            }
+
+        } catch (\Exception $e) {
+            logger()->debug($e->getMessage());
+            $this->messages[] = ['role' => 'assistant', 'content' => 'Error communicating with Vanna API'];
         }
 
         request()->session()->put($this->sessionKey, $this->messages);
 
     }
 
+    function handleApiResponseData($data) {
+        // Check if the type is 'df'
+        if (isset($data['type']) && $data['type'] === 'df') {
+            // Decode the 'df' field which is a JSON string
+            $df = json_decode($data['df'], true);
+    
+            // Generate HTML table
+            $html = '<table border="1"><tr>';
+            // Add table headers
+            foreach (array_keys($df[0]) as $header) {
+                $html .= '<th>' . htmlspecialchars($header) . '</th>';
+            }
+            $html .= '</tr>';
+    
+            // Add table rows
+            foreach ($df as $row) {
+                $html .= '<tr>';
+                foreach ($row as $cell) {
+                    $html .= '<td>' . htmlspecialchars($cell) . '</td>';
+                }
+                $html .= '</tr>';
+            }
+            $html .= '</table>';
+    
+            return $html;
+        }
+    
+        // Handle other types or return a default message
+        return 'No table data available.';
+    }
 }
