@@ -2,16 +2,6 @@
 
 Filament Vanna Bot is a filament plugin that allow you to use Vanna.ai API within Filament Application.
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/icetalker/filament-chatgpt-bot.svg?style=flat-square)](https://packagist.org/packages/icetalker/filament-chatgpt-bot)
-[![Total Downloads](https://img.shields.io/packagist/dt/icetalker/filament-chatgpt-bot.svg?style=flat-square)](https://packagist.org/packages/icetalker/filament-chatgpt-bot)
-
-Preview:
-![](https://raw.githubusercontent.com/icetalker/filament-chatgpt-bot/main/screenshot/dark-mode.png)
-Full Screen:
-![](https://raw.githubusercontent.com/icetalker/filament-chatgpt-bot/main/screenshot/full-screen.png)
-Light Mode:
-![](https://raw.githubusercontent.com/icetalker/filament-chatgpt-bot/main/screenshot/light-mode.png)
-
 ## Feature
 
 - Integrate with Vanna.ai
@@ -109,9 +99,9 @@ Please review [our security policy](../../security/policy) on how to report secu
 
 ## Credits
 
-- [Martin Hwang](https://github.com/icetalker)
+- [Andres Lancheros](https://github.com/alancherosr)
 - [All Contributors](../../contributors)
 
 ## Support
 
-Any Problem please email: martin.hwang@outlook.com.
+Any Problem please email: alancherosr@gmail.com.

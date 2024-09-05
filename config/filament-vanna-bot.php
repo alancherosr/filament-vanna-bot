@@ -3,14 +3,6 @@
 // config for Alancherosr/FilamentVannaBot
 return [
     'enable' => true,
-
     'botname' => env('BOTNAME'),
-
-    'openai' => [
-        'api_key' => env('OPENAI_API_KEY'),
-        'organization' => env('OPENAI_ORGANIZATION'),
-    ],
-    
-    'proxy'=> env('OPENAI_PROXY'),
-
+    'vanna_api_url' => env('VANNA_API_URL', 'http://kpi-copilot-api:5000/api/v0'),
 ];

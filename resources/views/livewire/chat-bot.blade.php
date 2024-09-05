@@ -86,7 +86,7 @@
             @endforeach
         </div>
         <div class="border-t-2 border-gray-200 px-4 pt-4 mb-2 sm:mb-0">
-            <div class="py-2 text-sm" style="color:rgb(35, 190, 100)" wire:loading wire:target="sendMessage">Message Sending...</div>
+            <div class="py-2 text-sm" style="color:rgb(35, 190, 100)" wire:loading wire:target="sendMessage">Buscando respuesta...</div>
             <div class="flex flex-col w-full py-2 flex-grow md:py-3 md:pl-4 relative bg-gray-200 dark:border-gray-900/50 dark:text-white dark:bg-gray-700 rounded-md shadow">
                 <textarea wire:model.defer="question" tabindex="0" data-id="root" style="max-height: 200px; height: 24px; " placeholder="Send a message..." class="m-0 w-full resize-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus:outline-none focus:placeholder-gray-400 dark:bg-transparent pl-2 md:pl-0" id="chat-input"></textarea>
                 <button wire:click="sendMessage" wire:loading.attr="disabled" class="absolute p-1 rounded-md text-gray-500 bottom-1.5 md:bottom-2.5 hover:bg-gray-100 enabled:dark:hover:text-gray-400 dark:hover:bg-gray-900 disabled:hover:bg-transparent dark:disabled:hover:bg-transparent right-1 md:right-2 disabled:opacity-40" title="press CTRL+S to send"><svg stroke="currentColor" fill="none" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 mr-1" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
@@ -185,7 +185,7 @@
         }
         
     </style>
-
+@script
     <script>
         const el = document.getElementById('messages')
         window.onload = function(){
@@ -213,31 +213,31 @@
             // }
             if(event.ctrlKey && event.altKey && event.keyCode===90){
                 event.preventDefault();
-                Livewire.emit("ctrl+alt+z");
+                Livewire.dispatch("ctrl+alt+z");
                 return
             }
-            if(event.ctrlKey && event.keyCode===83){
+            if(event.ctrlKey && event.keyCode===13){
                 event.preventDefault();
-                Livewire.emit("ctrl+s");
+                Livewire.dispatch("enter");
+                document.querySelector('#chat-input').value = "buscando la respuesta, por favor espere un momento.";
                 return
             }
             if(event.ctrlKey && event.keyCode===82){
                 event.preventDefault();
-                Livewire.emit("ctrl+r");
+                Livewire.dispatch("ctrl+r");
                 return
             }
             if(event.ctrlKey && event.keyCode===80){
                 event.preventDefault();
-                Livewire.emit("ctrl+p");
+                Livewire.dispatch("ctrl+p");
                 return
             }
             if(event.ctrlKey && event.keyCode===68){
                 event.preventDefault();
-                Livewire.emit("ctrl+d");
+                Livewire.dispatch("ctrl+d");
                 return
             }
-
         }
     </script>
-
+@endscript
 </div>

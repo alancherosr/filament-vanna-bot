@@ -3,7 +3,9 @@
 namespace Alancherosr\FilamentVannaBot\Components;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Alancherosr\FilamentVannaBot\Services\BedrockService;
 
 class VannaBot extends Component
 {
@@ -15,10 +17,11 @@ class VannaBot extends Component
     public string $winPosition;
     public bool $showPositionBtn;
     public bool $panelHidden;
+    public int $maxRowsForTables;
     private string $sessionKey;
     protected $listeners = [
         //shortcut
-        'ctrl+s' => 'sendMessage',
+        'enter' => 'sendMessage',
         'ctrl+r' => 'changeWinWidth',
         'ctrl+p' => 'changeWinPosition',
         'ctrl+d' => 'resetSession',
@@ -38,6 +41,7 @@ class VannaBot extends Component
         $this->showPositionBtn = true;
         $this->messages = session($this->sessionKey, []);
         $this->question = "";
+        $this->maxRowsForTables = 5;
     }
 
     public function render()
@@ -52,19 +56,17 @@ class VannaBot extends Component
 
     public function sendMessage(): void
     {
-        if(empty(trim($this->question))){
+        if (empty(trim($this->question))) {
             $this->question = "";
             return;
         }
 
         // Store the question in a temporary variable before resetting it
         $user_question = trim($this->question);
-
         $this->messages[] = [
             "role" => 'user',
             "content" => $user_question,
         ];
-
         $this->dispatch('sendmessage', ['message' => $this->question]);
         $this->question = "";
         $this->chat($user_question);
@@ -72,10 +74,10 @@ class VannaBot extends Component
 
     public function changeWinWidth(): void
     {
-        if($this->winWidth=="width:350px;"){
+        if ($this->winWidth == "width:350px;") {
             $this->winWidth = "width:100%;";
             $this->showPositionBtn = false;
-        }else{
+        } else {
             $this->winWidth = "width:350px;";
             $this->showPositionBtn = true;
         }
@@ -83,9 +85,9 @@ class VannaBot extends Component
 
     public function changeWinPosition(): void
     {
-        if($this->winPosition != "left"){
+        if ($this->winPosition != "left") {
             $this->winPosition = "left";
-        }else{
+        } else {
             $this->winPosition = "";
         }
     }
@@ -103,13 +105,13 @@ class VannaBot extends Component
 
     protected function chat(string $user_question): void
     {
-
+        $vanna_api_url = config('filament-vanna-bot.vanna_api_url');
         try {
             // First, send the question to Vanna API to generate SQL
-            $response = Http::get('http://kpi-copilot-api:5000/api/v0/generate_sql', [
+            $response = Http::get("{$vanna_api_url}/generate_sql", [
                 'question' => $user_question,
             ]);
-            
+
             $response_body = $response->json();
 
             if (!$response->ok() || isset($response_body['error'])) {
@@ -123,13 +125,15 @@ class VannaBot extends Component
             $sql_id = $response_body['id'];
 
             // After receiving the SQL, execute it using Vanna API
-            $sql_response = Http::get('http://kpi-copilot-api:5000/api/v0/run_sql', [
+            $sql_response = Http::get("{$vanna_api_url}/run_sql", [
                 'id' => $sql_id,
+                'head' => $this->maxRowsForTables
             ]);
 
             $sql_response_body = $sql_response->json();
 
             logger()->debug('Into chat', [
+                'this->maxRowsForTables' => $this->maxRowsForTables,
                 'question' => $user_question,
                 'response_body' => $response_body,
                 'sql_id' => $sql_id,
@@ -148,43 +152,72 @@ class VannaBot extends Component
                     'content' => $sql_response_parsed,
                 ];
             }
-
         } catch (\Exception $e) {
             logger()->debug($e->getMessage());
             $this->messages[] = ['role' => 'assistant', 'content' => 'Error communicating with Vanna API'];
         }
 
         request()->session()->put($this->sessionKey, $this->messages);
-
     }
 
-    function handleApiResponseData($data) {
+    function handleApiResponseData($data)
+    {
+        $vanna_api_url = config('filament-vanna-bot.vanna_api_url');
+        
         // Check if the type is 'df'
         if (isset($data['type']) && $data['type'] === 'df') {
             // Decode the 'df' field which is a JSON string
             $df = json_decode($data['df'], true);
-    
-            // Generate HTML table
-            $html = '<table border="1"><tr>';
-            // Add table headers
-            foreach (array_keys($df[0]) as $header) {
-                $html .= '<th>' . htmlspecialchars($header) . '</th>';
-            }
-            $html .= '</tr>';
-    
-            // Add table rows
-            foreach ($df as $row) {
-                $html .= '<tr>';
-                foreach ($row as $cell) {
-                    $html .= '<td>' . htmlspecialchars($cell) . '</td>';
+
+            // Assuming $df is an array of associative arrays representing rows of the table
+            if (!empty($df)) {
+                $html = "<table class='table-auto w-full'>";
+                $html .= "<thead><tr>";
+
+                // Instantiate BedrockService
+                $bedrock_service = new BedrockService();
+
+                // Generate table headers with translation
+                foreach (array_keys($df[0]) as $column) {
+                    $translatedHeader = $bedrock_service->translateTableHeader($column);
+                    $html .= "<th class='px-4 py-2'>{$translatedHeader}</th>";
                 }
-                $html .= '</tr>';
+
+                $html .= "</tr></thead><tbody>";
+
+                // Generate table rows
+                foreach ($df as $row) {
+                    $html .= "<tr>";
+                    foreach ($row as $key => $value) {
+                        // Check if the value is numeric
+                        $class = is_numeric($value) ? 'text-center' : '';
+                        $html .= "<td class='border px-4 py-2 {$class}'>" . htmlspecialchars($value) . "</td>";
+                    }
+                    $html .= "</tr>";
+                }
+
+                $html .= "</tbody></table>";
             }
-            $html .= '</table>';
-    
+
+            // Download CSV file and store locally
+            if (isset($data['df']) && !empty($data['df'])) {
+                $df = json_decode($data['df'], true);
+                if (count($df) == $this->maxRowsForTables) {
+                    $id = htmlspecialchars($data['id']);
+                    $csv_url = "{$vanna_api_url}/download_csv?id={$id}";
+                    $csv_content = Http::get($csv_url)->body();
+                    $file_path = "csv/{$id}.csv";
+                    Storage::put($file_path, $csv_content);
+
+                    // Generate a secure download link
+                    $download_link = route('download.csv', ['filename' => "{$id}.csv"]);
+                    $html .= "<br><a href='{$download_link}' download class='text-blue-500 underline'>Descarga el conjunto de datos completo en csv</a>";
+                }
+            }
+
             return $html;
         }
-    
+
         // Handle other types or return a default message
         return 'No table data available.';
     }
