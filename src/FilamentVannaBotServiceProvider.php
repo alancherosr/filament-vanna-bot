@@ -7,6 +7,7 @@ use Spatie\LaravelPackageTools\PackageServiceProvider;
 use Filament\Support\Facades\FilamentView;
 use Illuminate\Support\Facades\Blade;
 use Alancherosr\FilamentVannaBot\Components\VannaBot;
+use Filament\Facades\Filament;
 use Livewire\Livewire;
 
 class FilamentVannaBotServiceProvider extends PackageServiceProvider
@@ -34,13 +35,16 @@ class FilamentVannaBotServiceProvider extends PackageServiceProvider
 
         Livewire::component('filament-vanna-bot', VannaBot::class);
 
-        if(config('filament-vanna-bot.enable')){
-            FilamentView::registerRenderHook(
-                'panels::body.end',
-                fn (): string => auth()->check() ? Blade::render('@livewire(\'filament-vanna-bot\')'):'',
-            );
-        }
-
+        Filament::serving(function () {
+            if (auth()->check() && config('filament-vanna-bot.enable')) {
+                FilamentView::registerRenderHook(
+                    'panels::body.end',
+                    fn (): string => auth()->user()->company->getSetting('kpi_copilot_enabled') && auth()->user()->can('use_copilot') 
+                        ? Blade::render('@livewire(\'filament-vanna-bot\')')
+                        : ''
+                );
+            }
+        });
     }
 
     protected function bootLoaders()

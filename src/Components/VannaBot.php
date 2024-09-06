@@ -19,6 +19,7 @@ class VannaBot extends Component
     public bool $panelHidden;
     public int $maxRowsForTables;
     private string $sessionKey;
+    private string $vanna_api_url;
     protected $listeners = [
         //shortcut
         'enter' => 'sendMessage',
@@ -31,6 +32,7 @@ class VannaBot extends Component
     public function __construct()
     {
         $this->sessionKey = auth()->id() . '-messages';
+        $this->vanna_api_url = auth()->user()->company->getSetting('kpi_copilot_api_url');
     }
 
     public function mount(): void
@@ -105,10 +107,9 @@ class VannaBot extends Component
 
     protected function chat(string $user_question): void
     {
-        $vanna_api_url = config('filament-vanna-bot.vanna_api_url');
         try {
             // First, send the question to Vanna API to generate SQL
-            $response = Http::get("{$vanna_api_url}/generate_sql", [
+            $response = Http::get("{$this->vanna_api_url}/generate_sql", [
                 'question' => $user_question,
             ]);
 
@@ -125,7 +126,7 @@ class VannaBot extends Component
             $sql_id = $response_body['id'];
 
             // After receiving the SQL, execute it using Vanna API
-            $sql_response = Http::get("{$vanna_api_url}/run_sql", [
+            $sql_response = Http::get("{$this->vanna_api_url}/run_sql", [
                 'id' => $sql_id,
                 'head' => $this->maxRowsForTables
             ]);
@@ -175,8 +176,6 @@ class VannaBot extends Component
 
     function handleApiResponseData($data)
     {
-        $vanna_api_url = config('filament-vanna-bot.vanna_api_url');
-        
         // Check if the type is 'df'
         if (isset($data['type']) && $data['type'] === 'df') {
             // Decode the 'df' field which is a JSON string
@@ -217,7 +216,7 @@ class VannaBot extends Component
                 $df = json_decode($data['df'], true);
                 if (count($df) == $this->maxRowsForTables) {
                     $id = htmlspecialchars($data['id']);
-                    $csv_url = "{$vanna_api_url}/download_csv?id={$id}";
+                    $csv_url = "{$this->vanna_api_url}/download_csv?id={$id}";
                     $csv_content = Http::get($csv_url)->body();
                     $file_path = "csv/".auth()->user()->id."/{$id}.csv";
                     Storage::put($file_path, $csv_content);
