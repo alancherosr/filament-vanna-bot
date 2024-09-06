@@ -154,7 +154,7 @@ class VannaBot extends Component
             }
         } catch (\Exception $e) {
             logger()->debug($e->getMessage());
-            $this->messages[] = ['role' => 'assistant', 'content' => 'Error communicating with Vanna API'];
+            $this->messages[] = ['role' => 'assistant', 'content' => 'Error communicating with KPI Copilot API'];
         }
 
         request()->session()->put($this->sessionKey, $this->messages);
@@ -206,7 +206,7 @@ class VannaBot extends Component
                     $id = htmlspecialchars($data['id']);
                     $csv_url = "{$vanna_api_url}/download_csv?id={$id}";
                     $csv_content = Http::get($csv_url)->body();
-                    $file_path = "csv/{$id}.csv";
+                    $file_path = "csv/".auth()->user()->id."/{$id}.csv";
                     Storage::put($file_path, $csv_content);
 
                     // Generate a secure download link
