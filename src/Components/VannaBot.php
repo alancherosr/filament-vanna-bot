@@ -155,6 +155,19 @@ class VannaBot extends Component
         } catch (\Exception $e) {
             logger()->debug($e->getMessage());
             $this->messages[] = ['role' => 'assistant', 'content' => 'Error communicating with KPI Copilot API'];
+        } finally {
+            // Record activity log
+            if (class_exists('\Spatie\Activitylog\Models\Activity')) {
+                activity()
+                    ->withProperties([
+                        'qty of rows to show online' => $this->maxRowsForTables,
+                        'question' => $user_question,
+                        'sql_queyr' => $response_body['text'] ?? '',
+                        'sql_response_body' => $sql_response_body['df'] ?? '',
+                    ])
+                    ->event('copilot-request')
+                    ->log('Question on Copilot');
+            }
         }
 
         request()->session()->put($this->sessionKey, $this->messages);
