@@ -16,6 +16,7 @@ final class BedrockService{
     public function translateTableHeader(string $header): string {
         $prompt = "Translate the following table header name to spanish and format it as a human readable text:\n\n{$header}.";
         $prompt .= "Return only the translated text without any additional information before or after the translation.";
+        $prompt .= "If header has the prefix 'd_', or 'n_' or 'y_', remove it before translating.";
 
         return $this->getInferenceFromClaudeHaiku($prompt);
     }
