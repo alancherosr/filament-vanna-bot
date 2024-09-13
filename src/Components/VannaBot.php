@@ -76,11 +76,11 @@ class VannaBot extends Component
 
     public function changeWinWidth(): void
     {
-        if ($this->winWidth == "width:350px;") {
+        if ($this->winWidth == "width:550px;") {
             $this->winWidth = "width:100%;";
             $this->showPositionBtn = false;
         } else {
-            $this->winWidth = "width:350px;";
+            $this->winWidth = "width:550px;";
             $this->showPositionBtn = true;
         }
     }
