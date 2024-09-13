@@ -144,7 +144,7 @@ class VannaBot extends Component
             if (!$sql_response->ok() || isset($sql_response_body['error'])) {
                 $this->messages[] = [
                     'role' => 'assistant',
-                    'content' => $sql_response_body['error']['message'] ?? 'Error executing SQL',
+                    'content' => $sql_response_body['error']['message'] ?? 'No encontramos suficiente información actualmente para responder esta pregunta.',
                 ];
             } else {
                 $sql_response_parsed = $this->handleApiResponseData($sql_response_body);
@@ -155,7 +155,7 @@ class VannaBot extends Component
             }
         } catch (\Exception $e) {
             logger()->debug($e->getMessage());
-            $this->messages[] = ['role' => 'assistant', 'content' => 'Error communicating with KPI Copilot API'];
+            $this->messages[] = ['role' => 'assistant', 'content' => 'Upss! tenemos un problema de comunicación con el servicio.'];
         } finally {
             // Record activity log
             if (class_exists('\Spatie\Activitylog\Models\Activity')) {
