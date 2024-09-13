@@ -163,7 +163,7 @@ class VannaBot extends Component
                     ->withProperties([
                         'qty of rows to show online' => $this->maxRowsForTables,
                         'question' => $user_question,
-                        'sql_queyr' => $response_body['text'] ?? '',
+                        'sql_query' => $response_body['text'] ?? '',
                         'sql_response_body' => $sql_response_body['df'] ?? '',
                     ])
                     ->event('copilot-request')
